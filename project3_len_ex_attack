@@ -1,0 +1,31 @@
+from SM3 import digest as hash_func
+from hashlib import sha256#Pyhon模块中的SHA-256
+from sm3_ρ_attack import rho_attack
+import struct
+H = hash_func
+#消息填充
+def create_pad(len1):
+        pad = [0x80]
+        reserve1 = len1 % 64 + 1
+        range_end = 56 if reserve1 <= 56 else 120
+        pad.extend([0] * (range_end - reserve1))
+        bit_length = len1 * 8
+        pad.extend(struct.pack(">Q", bit_length))
+        return bytes(pad)
+#长度扩展计算 hash值
+def len_extend(p,ext_msg):
+        new_hsh = H(p+ext_msg)#消息扩展后的hash值
+        return new_hsh
+def main():
+    fast_d,fast_p,p=rho_attack(16)#fast_p,p是hash值fast_d的两个原像
+    p=p+create_pad(len(p))
+    fast_p=fast_p+create_pad(len(fast_p))#消息填充
+    ext_msg=b"length extend massage"#长度扩展消息任选
+    new_hsh = len_extend(p,ext_msg)
+    new_msg_1=p+ext_msg
+    new_msg_2=fast_p+ext_msg
+    print(new_msg_1)
+    print(new_msg_2)
+
+if __name__ == '__main__':
+    main()
