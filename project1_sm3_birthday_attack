@@ -1,0 +1,40 @@
+#SM3生日攻击
+import os
+from SM3 import digest as hash_func
+import math
+#n为所需hash值个数，d为hash值的取值空间，计算n,d在不同取值下生日攻击成功的概率
+def calculate(d,n):
+  exponent = (-n * (n - 1)) / (2 * d)
+  return 1 - math.e ** exponent;
+
+hash_func = lambda msg:hash_func(msg)[:4]#截取hash值的前16bit
+#离线阶段
+def birthday_attack_offline(byte_len: int):
+   
+
+    lst = []#查找表，用于存储消息—hash值对
+    random_size = 1 << byte_len << 3)
+    for i in range(random_size):
+        p = os.urandom(byte_len)#原始消息值
+        d = hash_func(p)  #生成hash值
+        lst.append((d, p))#存储消息—hash值对
+    lst.sort(key=lambda x: x[0])#将消息—hash值对排序，便于查找
+    return lst
+#在线阶段
+def birthday_attack_online(byte_len: int,lst):
+    p = os.urandom(byte_len)
+    d = hash_func(p)
+    exam=(d,p)#随机生成消息—hash值对
+     for i in range(1 << (byte_len << 3)):#查找
+        if exam[0]==lst[i][0] and exam[1]!=lst[i][1]:
+            return p,lst[i][1]#hash值碰撞的两个消息
+
+def main():
+    lst = birthday_attack_offline(16)
+    res = birthday_attack_online(16,lst)
+    print(res)
+
+
+if __name__ == '__main__':
+    main()
+
