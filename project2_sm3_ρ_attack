@@ -1,0 +1,26 @@
+import time
+from SM3 import digest as hash_func
+def rho_attack(byte_len: int):
+    R = lambda x: x
+    H = lambda m: hash_func(m)[:4]#简写SM3hash函数,只取hash值前16bit
+    random_size = 1 << byte_len << 3
+    for i in range(random_size):
+        start = os.urandom(byte_len)
+        d =  hash_func(start)[:4]#生成hash值前16bit
+    #选取的ρ函数为计算hash值的hash值
+        fast_p = R(d)
+        fast_d = H(fast_p)
+        while fast_d != d:#判断在ρ函数迭代过程中是否有碰撞
+            p = R(d)
+            d = H(p)
+            fast_p = R(H(R(fast_d)))
+            fast_d = H(fast_p)
+        if  fast_d == d:
+            return fast_d,fast_p,p#fast_p,p是hash值fast_d的两个原像
+
+def main():
+    print(rho_attack(16))
+
+
+if __name__ == '__main__':
+    main()
